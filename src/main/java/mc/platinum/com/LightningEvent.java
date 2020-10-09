@@ -23,7 +23,7 @@ public class LightningEvent implements Listener {
         world.strikeLightningEffect(location);
         killer.playEffect(killer.getLocation(), Effect.FLAME, Integer.MAX_VALUE);
         killer.playSound(killer.getLocation(), Sound.ITEM_PICKUP, 2f, 2f);
-            System.out.println("PvP: " + killer + "Killed " + killed);
+            System.out.println("PvP: " + killer.getDisplayName() + "Killed " + killed.getDisplayName());
 
     }
 }}

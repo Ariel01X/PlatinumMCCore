@@ -10,6 +10,6 @@ commands:
   switcher:
     description: Switcher Ball
     usage: /<command>
-  flashtest:
-    description: Test command
+  flashbang:
+    description: Flashbang
     usage: /<command>
