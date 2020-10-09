@@ -7,8 +7,12 @@
     <groupId>mc.platinum.com</groupId>
     <artifactId>PlatinumCore</artifactId>
     <version>1.0-SNAPSHOT</version>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
     <repositories>
-        <!-- This adds the Spigot Maven repository to the build -->
         <repository>
             <id>spigot-repo</id>
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
@@ -20,17 +24,18 @@
     </repositories>
 
     <dependencies>
+        <!-- MiniNBT library -->
         <dependency>
             <groupId>com.github.I-Al-Istannen</groupId>
             <artifactId>MiniNBT</artifactId>
             <version>e1a901d</version>
         </dependency>
-        <!--This adds the Spigot API artifact to the build -->
+        <!-- Spigot-API -->
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
             <version>1.8.8-R0.1-SNAPSHOT</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
@@ -41,13 +46,12 @@
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>3.2.4</version>
                 <configuration>
-                <relocations>
-                    <relocation>
-                        <pattern>me.ialistannen.mininbt</pattern>
-                        <shadedPattern>com.yourpackage.me.ialistannen.mininbt</shadedPattern>
-                    </relocation>
-                </relocations>
-                    <!-- put your configurations here -->
+                    <relocations>
+                        <relocation>
+                            <pattern>me.ialistannen.mininbt</pattern>
+                            <shadedPattern>com.yourpackage.me.ialistannen.mininbt</shadedPattern>
+                        </relocation>
+                    </relocations>
                 </configuration>
                 <executions>
                     <execution>
@@ -59,15 +63,10 @@
                 </executions>
             </plugin>
             <plugin>
-
-
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.1</version>
                 <configuration>
-                        <archive>
-                            <manifestFile>src/main/resources/META_INF/MANIFEST.MF</manifestFile>
-                        </archive>
                     <source>1.8</source>
                     <target>1.8</target>
                 </configuration>
