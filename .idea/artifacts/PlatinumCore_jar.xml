@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="PlatinumCore:jar">
+    <output-path>$USER_HOME$/Downloads</output-path>
+    <root id="archive" name="PlatinumCore.jar">
+      <element id="module-output" name="pmc moderator tools" />
+      <element id="extracted-dir" path="$USER_HOME$/Downloads/PlatinumTestServer/spigot.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
