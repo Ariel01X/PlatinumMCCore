@@ -70,7 +70,7 @@ public class FlashbangEvent implements Listener, CommandExecutor {
     }
     @EventHandler
     public void onRightClickHoldingFlashBang(PlayerInteractEvent e) {
-        if(e.getAction() == Action.RIGHT_CLICK_AIR){
+        if(e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK){
             ItemStack item  = e.getItem();
             NBTWrappers.NBTTagCompound compound = ItemNBTUtil.getTag(item);
             if(compound.getBoolean("flashBangItem")) {

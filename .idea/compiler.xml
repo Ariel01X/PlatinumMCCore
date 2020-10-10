@@ -7,9 +7,11 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="pmc moderator tools" />
+        <module name="PlatinumCore" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="8">
+      <module name="PlatinumCore" target="1.8" />
       <module name="pmc moderator tools" target="1.8" />
     </bytecodeTargetLevel>
   </component>
