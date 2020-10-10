@@ -6,7 +6,6 @@ import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -18,29 +17,24 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.projectiles.ProjectileSource;
 
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Logger;
 
-
 public class SwitcherEvent implements Listener, CommandExecutor {
+
     private final Logger logger = Logger.getLogger(String.valueOf(getClass()));
-    private static final long FIFTY_MILLISECONDS = Duration.ofMillis(50L).toNanos();
 
-
-    private final Set<ItemStack> snowBallItems = new HashSet<>();
+    private final Map<UUID, Cooldown> cooldowns = new HashMap<>();
     private final Set<Snowball> snowBallEntities = new HashSet<>();
-    private Plugin plugin = PMC.getPlugin(PMC.class);
 
+    @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         // Validate user permissions
 
@@ -72,22 +66,33 @@ public class SwitcherEvent implements Listener, CommandExecutor {
 
     @EventHandler
     public void onRightClickHoldingCustomSnowball(PlayerInteractEvent event) {
-        if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+        Action action = event.getAction();
+        if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
             ItemStack item = event.getItem();
             Player player = event.getPlayer();
             logger.info("Target Block is " + event.getClickedBlock());
-            NBTWrappers.NBTTagCompound compound = ItemNBTUtil.getTag(item);
-            if (compound.getBoolean("amazingSnowball")) {
-                logger.info("Found Custom Snowball");
-                event.setCancelled(true);
-                    Snowball launched = event.getPlayer().launchProjectile(Snowball.class);
-                    snowBallEntities.add(launched);
-                    logger.info("Launched Custom Snowball");
-                    player.getInventory().setItemInHand(null);
-                }
-            }
-        }
 
+            if (!ItemNBTUtil.getTag(item).getBoolean("amazingSnowball")) {
+                return;
+            }
+            logger.info("Found Custom Snowball");
+            event.setCancelled(true);
+            Cooldown cooldown = cooldowns.computeIfAbsent(player.getUniqueId(), (k) -> new Cooldown(Duration.ofSeconds(5L)));
+            Duration timeLeft = cooldown.triggerOrGet();
+            if (!timeLeft.isZero()) {
+                sendMessage(player, "Your cooldown still has " + timeLeft.getSeconds() + " remaining");
+                return;
+            }
+            Snowball launched = player.launchProjectile(Snowball.class);
+            snowBallEntities.add(launched);
+            logger.info("Launched Custom Snowball");
+            player.getInventory().setItemInHand(null);
+        }
+    }
+    
+    private void sendMessage(CommandSender sender, String message) {
+        sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
+    }
 
     @EventHandler
     public void onSnowballHit(EntityDamageByEntityEvent event)
@@ -124,5 +129,10 @@ public class SwitcherEvent implements Listener, CommandExecutor {
                     event.setCancelled(true);
                 }
 
+    }
+    
+    @EventHandler
+    public void cleanupCooldown(PlayerQuitEvent evt) {
+        cooldowns.remove(evt.getPlayer().getUniqueId());
     }
 }
