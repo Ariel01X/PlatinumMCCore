@@ -36,10 +36,6 @@ public class SwitcherEvent implements Listener, CommandExecutor {
     private final Logger logger = Logger.getLogger(String.valueOf(getClass()));
     private static final long FIFTY_MILLISECONDS = Duration.ofMillis(50L).toNanos();
 
-    private HashMap<UUID,Long> cooldown = new HashMap<UUID, Long>();
-    private int cooldowntime = 30;
-
-
 
     private final Set<ItemStack> snowBallItems = new HashSet<>();
     private final Set<Snowball> snowBallEntities = new HashSet<>();
@@ -78,30 +74,12 @@ public class SwitcherEvent implements Listener, CommandExecutor {
     public void onRightClickHoldingCustomSnowball(PlayerInteractEvent event) {
         if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             ItemStack item = event.getItem();
+            Player player = event.getPlayer();
             logger.info("Target Block is " + event.getClickedBlock());
             NBTWrappers.NBTTagCompound compound = ItemNBTUtil.getTag(item);
             if (compound.getBoolean("amazingSnowball")) {
                 logger.info("Found Custom Snowball");
-
-                Player player = event.getPlayer();
-                if (cooldown.containsKey(player.getUniqueId())) {
-                    long secondsLeft = ((cooldown.get(player.getUniqueId())) / 1000) + cooldowntime - System.currentTimeMillis() / 1000;
-                    if (secondsLeft > 0) {
-                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7You Can't Use &5Switcher&7 For another&5 " + secondsLeft + "&7 Seconds."));
-                    }
-                    event.setCancelled(true);
-                } else {
-                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7Your &5Switcher&7 Is now on cooldown for &5" + cooldowntime + "&7 Seconds."));
-                    cooldown.put(player.getUniqueId(), System.currentTimeMillis());
-                }
-            } else {
-
-                Player player = event.getPlayer();
-
-                long secondsLeft = ((cooldown.get(player.getUniqueId())) / 1000) + cooldowntime - System.currentTimeMillis() / 1000;
-                if (secondsLeft > 0) {
-                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7You Can't Use &5Switcher&7 For another&5 " + secondsLeft + "&7 Seconds."));
-                    event.setCancelled(true);
+                event.setCancelled(true);
                     Snowball launched = event.getPlayer().launchProjectile(Snowball.class);
                     snowBallEntities.add(launched);
                     logger.info("Launched Custom Snowball");
@@ -109,7 +87,7 @@ public class SwitcherEvent implements Listener, CommandExecutor {
                 }
             }
         }
-    }
+
 
     @EventHandler
     public void onSnowballHit(EntityDamageByEntityEvent event)
